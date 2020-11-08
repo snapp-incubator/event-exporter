@@ -1,0 +1,70 @@
+stages:
+ - test
+ - build
+ - push
+
+default:
+  image: golang:1.14
+  before_script:
+    - go env -w GOPROXY="https://repo.snapp.tech/repository/goproxy/"
+    - go mod download
+
+go_fmt:
+  stage: test
+  script:
+    - go fmt ./...
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: on_success
+
+go_vet:
+  stage: test
+  script:
+    - go vet ./...
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: on_success
+
+unit_tests:
+  stage: test
+  script:
+    - go test -race -v ./... -coverprofile .testCoverage.txt
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: on_success
+
+build:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  before_script:
+    - whoami
+  script:
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest
+      --tag $CI_REGISTRY_IMAGE:latest .
+  retry:
+    max: 2
+    when: runner_system_failure
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: on_success
+
+push:
+  stage: push
+  image: docker:stable
+  services:
+    - docker:dind
+  before_script:
+    - whoami
+  script:
+    - docker build --cache-from docker.io/$DOCKERHUB_USER/$CI_PROJECT_NAME:latest
+      --tag docker.io/$DOCKERHUB_USER/$CI_PROJECT_NAME:latest .
+    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+    - docker push docker.io/$DOCKERHUB_USER/$CI_PROJECT_NAME:latest
+  retry:
+    max: 2
+    when: runner_system_failure
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      when: on_success
