@@ -1,8 +1,0 @@
-# All Templates, BuildConfigs and ImageStreams will be created in this namespace.
-# To customize namespace for development, copy this file as .makerc and replace namespace below.
-NAMESPACE=default
-
-# Specify secret you add on openshift (i.e. branch) to build the images from.
-
-REPOSITORY_SOURCE_SECRET=bot.ci
-OPENSHIFT_URL_FQDN=https://okd.private.teh-1.snappcloud.io

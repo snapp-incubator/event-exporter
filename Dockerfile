@@ -1,32 +1,37 @@
-FROM golang:1.11.4-alpine3.8 AS build
-ENV GO111MODULE=on \
-    GOOS=linux \
-    GOARCH=amd64 \
-    http_proxy=http://snapp-mirror:TmfBZb68qjGGF6feBdqX@mirror-fra-1.snappcloud.io:30128 \
-    https_proxy=http://snapp-mirror:TmfBZb68qjGGF6feBdqX@mirror-fra-1.snappcloud.io:30128
-RUN apk add --update --no-cache \
-      build-base \
-      git \
-      ca-certificates \
-    && \
-    mkdir -p /src
-COPY go.sum go.mod /src/
-WORKDIR /src
-RUN go mod download
-COPY . /src
-RUN go build -ldflags="-w -s" -o event-exporter
+#build stage
+FROM golang:1.14-alpine AS builder
+RUN mkdir -p /go/src/app
+WORKDIR /go/src/app
+RUN apk add --no-cache git
 
-FROM alpine:3.8
+COPY go.sum go.mod /go/src/app/
+RUN go env -w GOPROXY="https://repo.snapp.tech/repository/goproxy/" && \
+    go env -w GONOSUMDB="gitlab.snapp.ir" && \
+    go env -w GO111MODULE="on"
+
+RUN go mod download
+
+COPY . /go/src/app
+RUN go build -ldflags="-w -s" -o event_exporter
+
+#final stage
+FROM alpine:3.12
+
 ENV TZ=UTC \
-    OPENSHIFT_NAMESPACE=default
+    PATH="/app:${PATH}"
+
 RUN apk add --update --no-cache \
       tzdata \
-      ca-certificates curl \
+      ca-certificates \
     && \
-    cp --remove-destination /usr/share/zoneinfo/${TZ} /etc/localtime && unset http_proxy && unset https_proxy && \
-    echo "${TZ}" > /etc/timezone
+    cp --remove-destination /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo "${TZ}" > /etc/timezone && \
+    mkdir -p /var/log && \
+    chgrp -R 0 /var/log && \
+    chmod -R g=u /var/log
 WORKDIR /app
-EXPOSE 8090
-COPY --from=build /src/event-exporter /app/
-CMD ["/app/event-exporter"]
-USER 1001
+
+COPY --from=builder /go/src/app/event_exporter /app/event_exporter
+ENTRYPOINT /app/event_exporter
+LABEL Name=event_exporter Version=1.0.0
+EXPOSE 9876

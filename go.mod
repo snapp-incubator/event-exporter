@@ -1,8 +1,8 @@
-module gitlab.snapp.ir/sajad.orouji/openshift-event-exporter
+module gitlab.snapp.ir/snappcloud/event-exporter
 
-go 1.12
+go 1.14
 
 require (
-	github.com/prometheus/client_golang v1.0.0
-	golang.org/x/build v0.0.0-20190616201242-c7084d3a2d60
+	github.com/prometheus/client_golang v1.8.0
+	golang.org/x/build v0.0.0-20201107035532-788b5c202b39
 )
