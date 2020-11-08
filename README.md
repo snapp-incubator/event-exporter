@@ -4,11 +4,9 @@ This tool is used to export Openshift events. It effectively runs a watch on
 the API server, detecting as granular as possible all changes to the event
 objects.
 
+From git@gitlab.snapp.ir:sajad.orouji/openshift-event-exporter.git
+
 ## Build
-
-`git clone git@gitlab.snapp.ir:sajad.orouji/openshift-event-exporter.git`
-
-`cd openshift-event-exporter`
 
 `docker build -t event-exporter .`
 
