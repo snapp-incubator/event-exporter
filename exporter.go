@@ -29,7 +29,7 @@ var (
 		Name:      "openshift",
 		Help:      "Event that happend since this application become available.",
 	},
-		[]string{"event_namespace", "event_name", "event_kind", "event_reason", "event_type", "event_subobject", "event_message", "event_source"},
+		[]string{"event_namespace", "event_reason", "event_kind", "event_type", "event_message", "event_source_host", "event_source_component"},
 	)
 )
 
@@ -121,11 +121,15 @@ func main() {
 
 			// Kubernetes sends all data from ETCD, we only want the logs since the stream started
 			if event.Event.LastTimestamp.Time.After(streamStart) {
-				//fmt.Printf("%v | Project: %v | Name: %v | Kind: %v | Reason: %v | Message: %v\n",
-				//	event.Event.LastTimestamp.Format(time.RFC3339),
-				//	event.Event.Namespace, event.Event.InvolvedObject.Name,
-				//	event.Event.Kind, event.Event.Reason, event.Event.Message)
-				ocEvents.WithLabelValues(event.Event.Namespace, event.Event.InvolvedObject.Name, event.Event.Kind, event.Event.Reason, event.Event.TypeMeta.Kind, event.Event.InvolvedObject.FieldPath, event.Event.Message, event.Event.Source.Host).Inc()
+				ocEvents.WithLabelValues(
+					event.Event.Namespace,           // event_namespace
+					event.Event.Reason,              // event_reason
+					event.Event.InvolvedObject.Kind, // event_kind
+					event.Type,                      // event_type
+					event.Event.Message,             // event_message
+					event.Event.Source.Host,         // event_source_host
+					event.Event.Source.Component,    // event_source_component
+				).Inc()
 			}
 
 		}
