@@ -2,7 +2,8 @@
 FROM golang:1.14-alpine AS builder
 RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
-RUN apk add --no-cache git
+RUN apk add --update --no-cache \
+    ca-certificates git
 
 COPY go.sum go.mod /go/src/app/
 RUN go env -w GOPROXY="https://repo.snapp.tech/repository/goproxy/" && \
