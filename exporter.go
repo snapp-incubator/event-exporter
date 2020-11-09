@@ -29,7 +29,7 @@ var (
 		Name:      "openshift",
 		Help:      "Event that happend since this application become available.",
 	},
-		[]string{"event_namespace", "event_reason", "event_kind", "event_type", "event_message", "event_source_host", "event_source_component"},
+		[]string{"event_namespace", "event_reason", "event_kind", "event_source_host", "event_source_component"},
 	)
 )
 
@@ -125,8 +125,6 @@ func main() {
 					event.Event.Namespace,           // event_namespace
 					event.Event.Reason,              // event_reason
 					event.Event.InvolvedObject.Kind, // event_kind
-					event.Type,                      // event_type
-					event.Event.Message,             // event_message
 					event.Event.Source.Host,         // event_source_host
 					event.Event.Source.Component,    // event_source_component
 				).Inc()
