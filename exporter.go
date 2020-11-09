@@ -13,13 +13,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"golang.org/x/build/kubernetes/api"
+	v1 "k8s.io/api/core/v1"
 )
 
 // Stream : structure for holding the stream of data coming from OpenShift
 type Stream struct {
-	Type  string    `json:"type,omitempty"`
-	Event api.Event `json:"object"`
+	Type  string   `json:"type,omitempty"`
+	Event v1.Event `json:"object"`
 }
 
 var (
@@ -63,9 +63,7 @@ func main() {
 	}()
 	// check and make sure we have the minimum config information before continuing
 	if apiAddr == "" {
-		// use the default internal cluster URL if not defined
-		apiAddr = "https://okd.private.teh-1.snappcloud.io"
-		log.Print("Missing environment variable OPENSHIFT_API_URL. Using default API URL")
+		log.Fatal("Missing environment variable OPENSHIFT_API_URL. Using default API URL")
 	}
 	if apiToken == "" {
 		// if we dont set it in the environment variable, read it out of

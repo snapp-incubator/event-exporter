@@ -50,3 +50,45 @@ This is your project name that must set if this variable no set application won'
 
 Prometheus endpoint uses port `8090` and `/metric`
 Metric name is `snappcloud_event_openshift` by default.
+
+## Events
+
+https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/events/event.go
+event_reason:
+    Pod:
+        Scheduled
+        Pulling
+        Pulled
+        Created
+        Started
+        --
+        BackOff
+        Unhealthy
+        FailedMount
+    ReplicationController:
+        SuccessfulCreate
+    DeploymentConfig:
+        DeploymentCreated
+    DaemonSet
+        FailedCreate
+    StatefulSet
+        FailedCreate
+    HorizontalPodAutoscaler
+        FailedGetResourceMetric
+    Node
+        Rebooted
+        NodeNotReady
+        HostPortConflict
+FailedScheduling
+FailedAttachVolume
+Failed
+Evicted
+
+
+---
+source component:
+    default-scheduler
+    kubelet
+    replication-controller
+    deploymentconfig-controller
+    a/d controller
