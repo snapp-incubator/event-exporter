@@ -1,34 +1,100 @@
 package main
 
 import (
-	"context"
-	"net/http"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	v1 "k8s.io/api/core/v1"
 )
 
 var (
-	ocEvents = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "snappcloud",
-		Subsystem: "event",
-		Name:      "openshift",
-		Help:      "Event that happend since this application become available.",
+	k8sNormalEvents = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "event",
+		Subsystem: "normal",
+		Name:      "k8s",
+		Help:      "Exports kubernetes normal events count.",
 	},
-		[]string{"event_namespace", "event_reason", "event_kind", "event_type", "event_source_host", "event_source_component"},
+		[]string{
+			"event_namespace",
+			"event_reason",
+			"event_kind",
+			"event_source_host",
+			"event_source_component",
+		},
+	)
+
+	k8sWarningEvents = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "event",
+		Subsystem: "warning",
+		Name:      "k8s",
+		Help:      "Exports kubernetes warning events count.",
+	},
+		[]string{
+			"event_namespace",
+			"event_reason",
+			"event_kind",
+			"event_source_host",
+			"event_source_component",
+			"event_message",
+		},
 	)
 )
 
-func metricserver(cancel context.CancelFunc) {
-	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-
-	startServer("8090", mux, cancel)
+func init() {
+	prometheus.MustRegister(k8sNormalEvents)
+	prometheus.MustRegister(k8sWarningEvents)
 }
 
-func init() {
-	prometheus.MustRegister(ocEvents)
+// IncNormalEvent parses and increases an event counter with corresponding labels.
+func IncNormalEvent(event *v1.Event) {
+
+	k8sNormalEvents.WithLabelValues(
+		event.Namespace,           // event_namespace
+		event.Reason,              // event_reason
+		event.InvolvedObject.Kind, // event_kind
+		event.Source.Host,         // event_source_host
+		event.Source.Component,    // event_source_component
+	).Inc()
+}
+
+// IncWarningEvent parses and increases an event counter with corresponding labels.
+func IncWarningEvent(event *v1.Event) {
+	m := ""
+
+	if event.Reason == "FailedMount" {
+		switch {
+		case strings.Contains(event.Message, "timeout expired waiting for volumes to attach or mount"):
+			m = "timeout expired waiting for volumes to attach or mount"
+		case strings.Contains(event.Message, "rpc error: code = DeadlineExceeded desc = context deadline exceeded"):
+			m = "rpc error: code = DeadlineExceeded desc = context deadline exceeded"
+		case strings.Contains(event.Message, "volumeattachments.storage.k8s.io"):
+			m = "volumeattachments not found"
+		case strings.Contains(event.Message, ": secret") || strings.Contains(event.Message, ": configmap"):
+			m = "secret or configmap error"
+		}
+	}
+
+	if event.Reason == "FailedAttachVolume" {
+		switch {
+		case strings.Contains(event.Message, "is attached to a different instance"):
+			m = "is attached to a different instance"
+		case strings.Contains(event.Message, "Volume is already used by pod"):
+			m = "Volume is already used by pod"
+		case strings.Contains(event.Message, "Volume is already exclusively attached to one node"):
+			m = "Volume is already exclusively attached to one node"
+		case strings.Contains(event.Message, "attachment timeout for volume"):
+			m = "attachment timeout"
+		case strings.Contains(event.Message, "status must be available or downloading"):
+			m = "status must be available or downloading"
+		}
+	}
+
+	k8sWarningEvents.WithLabelValues(
+		event.Namespace,           // event_namespace
+		event.Reason,              // event_reason
+		event.InvolvedObject.Kind, // event_kind
+		event.Source.Host,         // event_source_host
+		event.Source.Component,    // event_source_component
+		m,                         // event_message
+	).Inc()
 }

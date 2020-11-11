@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -29,16 +31,22 @@ func main() {
 	logs.InitLogs()
 	defer logs.FlushLogs()
 
-	_, cancel := context.WithCancel(context.Background())
+	bctx := context.Background()
+	ctx, cancel := context.WithCancel(bctx)
+	defer cancel()
+
 	clientset := getK8sClient()
 	factory := informers.NewSharedInformerFactory(clientset, time.Hour*24)
 	controller := NewEventExporterController(factory)
-	stop := make(chan struct{})
-	defer close(stop)
-	go metricserver(cancel)
-	err := controller.Run(stop)
+	err := controller.Run(ctx.Done())
 	if err != nil {
 		klog.Fatal(err)
 	}
-	select {}
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	startServer(":8090", mux, cancel)
 }
