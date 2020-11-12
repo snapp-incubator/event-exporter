@@ -15,11 +15,11 @@ var (
 		Help:      "Exports kubernetes normal events count.",
 	},
 		[]string{
-			"event_namespace",
-			"event_reason",
-			"event_kind",
-			"event_source_host",
-			"event_source_component",
+			"namespace",
+			"reason",
+			"kind",
+			"source_host",
+			"source_component",
 		},
 	)
 
@@ -30,12 +30,12 @@ var (
 		Help:      "Exports kubernetes warning events count.",
 	},
 		[]string{
-			"event_namespace",
-			"event_reason",
-			"event_kind",
-			"event_source_host",
-			"event_source_component",
-			"event_message",
+			"namespace",
+			"reason",
+			"kind",
+			"source_host",
+			"source_component",
+			"message",
 		},
 	)
 )
@@ -49,11 +49,11 @@ func init() {
 func IncNormalEvent(event *v1.Event) {
 
 	k8sNormalEvents.WithLabelValues(
-		event.Namespace,           // event_namespace
-		event.Reason,              // event_reason
-		event.InvolvedObject.Kind, // event_kind
-		event.Source.Host,         // event_source_host
-		event.Source.Component,    // event_source_component
+		event.Namespace,           // namespace
+		event.Reason,              // reason
+		event.InvolvedObject.Kind, // kind
+		event.Source.Host,         // source_host
+		event.Source.Component,    // source_component
 	).Inc()
 }
 
@@ -90,11 +90,11 @@ func IncWarningEvent(event *v1.Event) {
 	}
 
 	k8sWarningEvents.WithLabelValues(
-		event.Namespace,           // event_namespace
-		event.Reason,              // event_reason
-		event.InvolvedObject.Kind, // event_kind
-		event.Source.Host,         // event_source_host
-		event.Source.Component,    // event_source_component
-		m,                         // event_message
+		event.Namespace,           // namespace
+		event.Reason,              // reason
+		event.InvolvedObject.Kind, // kind
+		event.Source.Host,         // source_host
+		event.Source.Component,    // source_component
+		m,                         // message
 	).Inc()
 }
