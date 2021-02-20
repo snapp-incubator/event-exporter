@@ -4,9 +4,6 @@ RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
 
 COPY go.sum go.mod /go/src/app/
-RUN go env -w GOPROXY="https://repo.snapp.tech/repository/goproxy/" && \
-    go env -w GONOSUMDB="gitlab.snapp.ir" && \
-    go env -w GO111MODULE="on"
 
 RUN go mod download
 
