@@ -33,7 +33,7 @@ unit_tests:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       when: on_success
 
-.build:
+build:
   stage: build
   image: docker:stable
   services:
@@ -50,7 +50,7 @@ unit_tests:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       when: on_success
 
-.push:
+push:
   stage: push
   image: docker:stable
   services:
