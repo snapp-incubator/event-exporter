@@ -1,0 +1,14 @@
+# Default values for event-exporter.
+
+image:
+  repository: "docker.pkg.github.com/snapp-cab/event-exporter/image"
+  tag: "latest"
+port: 8090
+replicas: 1
+resources:
+  limits:
+    memory: "100Mi"
+    cpu: "1"
+  requests:
+    memory: "100Mi"
+    cpu: "1"

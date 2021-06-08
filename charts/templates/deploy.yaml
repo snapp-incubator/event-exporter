@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ template "event_exporter.fullname" . }}'
+  namespace: '{{ .Release.Namespace }}'
+  labels:
+    app: '{{ template "event_exporter.fullname" . }}'
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: '{{ template "event_exporter.fullname" . }}'
+  template:
+    metadata:
+      labels:
+        name: '{{ template "event_exporter.fullname" . }}'
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8090"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: event-exporter
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8090
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /metrics
+            port: 8090
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+      restartPolicy: Always
+      serviceAccount: '{{ template "event_exporter.fullname" . }}'
+      terminationGracePeriodSeconds: 30

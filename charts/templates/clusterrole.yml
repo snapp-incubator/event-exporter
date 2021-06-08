@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: '{{ template "event_exporter.fullname" . }}'
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["list", "watch"]
