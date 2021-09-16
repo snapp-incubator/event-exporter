@@ -1,8 +1,7 @@
 #build stage
-FROM golang:1.14.11-buster AS builder
+FROM golang:1.17-buster AS builder
 RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
-RUN go env -w GOPROXY="https://repo.snapp.tech/repository/goproxy/"
 
 COPY go.sum go.mod /go/src/app/
 
