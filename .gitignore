@@ -1,5 +1,6 @@
 event-exporter
 coverage.html
+dist/
 
 # Created by https://www.toptal.com/developers/gitignore/api/go,jetbrains+all,visualstudiocode,sublimetext,macos,osx,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,jetbrains+all,visualstudiocode,sublimetext,macos,osx,windows,linux
