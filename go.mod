@@ -6,7 +6,7 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	k8s.io/api v0.22.3
 	k8s.io/client-go v0.22.3
-	k8s.io/klog/v2 v2.20.0
+	k8s.io/klog/v2 v2.30.0
 	k8s.io/kubectl v0.22.3
 )
 
@@ -14,7 +14,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-logr/logr v1.0.0 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect
