@@ -23,13 +23,14 @@ func (c *EventExporterController) Run(stopCh <-chan struct{}) error {
 	c.informerFactory.Start(stopCh)
 	// wait for the initial synchronization of the local cache.
 	if !cache.WaitForCacheSync(stopCh, c.eventInformer.Informer().HasSynced) {
-		return fmt.Errorf("Failed to sync")
+		return fmt.Errorf("failed to sync")
 	}
 	return nil
 }
 
 func (c *EventExporterController) eventAdd(obj interface{}) {
 	event := obj.(*v1.Event)
+	IncSummaryEvent(event)
 	switch event.Type {
 	case "Normal":
 		IncNormalEvent(event)

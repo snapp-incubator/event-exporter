@@ -23,6 +23,20 @@ var (
 		},
 	)
 
+	k8sSummaryEvents = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "event",
+		Subsystem: "summary",
+		Name:      "k8s",
+		Help:      "Exports summary of k8s events count.",
+	},
+		[]string{
+			"namespace",
+			"reason",
+			"kind",
+			"type",
+		},
+	)
+
 	k8sWarningEvents = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "event",
 		Subsystem: "warning",
@@ -43,6 +57,17 @@ var (
 func init() {
 	prometheus.MustRegister(k8sNormalEvents)
 	prometheus.MustRegister(k8sWarningEvents)
+}
+
+// IncSummaryEvent parses and increases an event counter with corresponding labels.
+func IncSummaryEvent(event *v1.Event) {
+
+	k8sSummaryEvents.WithLabelValues(
+		event.Namespace,           // namespace
+		event.Reason,              // reason
+		event.InvolvedObject.Kind, // kind
+		event.Type,                // type
+	).Inc()
 }
 
 // IncNormalEvent parses and increases an event counter with corresponding labels.
