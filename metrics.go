@@ -57,6 +57,7 @@ var (
 func init() {
 	prometheus.MustRegister(k8sNormalEvents)
 	prometheus.MustRegister(k8sWarningEvents)
+	prometheus.MustRegister(k8sSummaryEvents)
 }
 
 // IncSummaryEvent parses and increases an event counter with corresponding labels.
