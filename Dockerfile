@@ -1,5 +1,5 @@
 #build stage
-FROM golang:1.20-buster AS builder
+FROM golang:1.23-bookworm AS builder
 
 WORKDIR /go/src/app
 
@@ -11,7 +11,7 @@ COPY . /go/src/app
 RUN go build -ldflags="-w -s" -o event_exporter
 
 #final stage
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
 ENV TZ=UTC \
   PATH="/app:${PATH}"
