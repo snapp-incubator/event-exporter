@@ -8,25 +8,26 @@ A prometheus exporter for exporting k8s events.
 
 ### Docker
 
-`docker build -t event-exporter .`
+```bash
+docker build -t event-exporter .
+```
 
 
 ### Binary
 
 ```bash
-git clone --depth 1 https://github.com/snapp-cab/event-exporter.git
+git clone https://github.com/snapp-incubator/event-exporter.git
 cd event-exporter
 go build
 ```
 
 ## Installation
 
-
 ### Docker
 
 
 ```bash
-sudo docker run -p 8080:8080 docker.pkg.github.com/snapp-cab/event-exporter/image:latest
+docker run -p 8080:8080 ghcr.io/snapp-incubator/event-exporter:main
 ```
 
 ### Helm chart
@@ -80,6 +81,7 @@ tar xvzf event-exporter-${VERSION}.linux-amd64.tar.gz event-exporter-${VERSION}.
 | StatefulSet             | FailedCreate
 | HorizontalPodAutoscaler | FailedGetResourceMetric
 | Node                    | Rebooted, NodeNotReady, HostPortConflict
+
 ## Security
 
 ### Reporting security vulnerabilities
