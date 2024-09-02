@@ -23,7 +23,7 @@ go build
 ### Docker
 
 ```bash
-docker run -p 8080:8080 ghcr.io/snapp-incubator/event-exporter:main
+docker run -p 8090:8090 ghcr.io/snapp-incubator/event-exporter:main
 ```
 
 ### Helm chart

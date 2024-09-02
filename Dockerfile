@@ -14,14 +14,13 @@ RUN go build -ldflags="-w -s" -o event_exporter
 FROM debian:buster-slim
 
 ENV TZ=UTC \
-    PATH="/app:${PATH}"
+  PATH="/app:${PATH}"
 
 RUN mkdir -p /var/log && \
-    chgrp -R 0 /var/log && \
-    chmod -R g=u /var/log
+  chgrp -R 0 /var/log && \
+  chmod -R g=u /var/log
 WORKDIR /app
 
 COPY --from=builder /go/src/app/event_exporter /app/event_exporter
-ENTRYPOINT /app/event_exporter
-LABEL Name=event_exporter Version=1.0.0
+ENTRYPOINT [ "/app/event_exporter" ]
 EXPOSE 8090
