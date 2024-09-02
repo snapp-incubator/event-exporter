@@ -1,8 +1,6 @@
 # Event Exporter
 
-A prometheus exporter for exporting k8s events.
-
-
+A Prometheus exporter for exporting k8s events.
 
 ## Build
 
@@ -11,7 +9,6 @@ A prometheus exporter for exporting k8s events.
 ```bash
 docker build -t event-exporter .
 ```
-
 
 ### Binary
 
@@ -25,21 +22,13 @@ go build
 
 ### Docker
 
-
 ```bash
 docker run -p 8080:8080 ghcr.io/snapp-incubator/event-exporter:main
 ```
 
 ### Helm chart
 
-* Prerequisites
-  * **Helm 3.0+** (Helm 2 is not supported)
-  * **Kubernetes 1.10+** - This is the earliest version of Kubernetes tested.
-    It is possible that this chart works with earlier versions but it is
-    untested.
-
-
-1. Add the HashiCorp Helm Repository:
+1. Add the Event Exporter Helm Repository:
 
 ```bash
 helm repo add snapp-cab https://snapp-cab.github.io/event-exporter/charts
@@ -62,31 +51,31 @@ tar xvzf event-exporter-${VERSION}.linux-amd64.tar.gz event-exporter-${VERSION}.
 
 ## Metrics and events
 
-
-| Metric                                          | Notes
-|-------------------------------------------------|------------------------------------
-| event_normal_k8s   | Normal k8s events. Labels: kind, namespace, reason, source_components
-| event_warning_k8s  | Warning k8s events. Labels: kind, namespace, reason, source_components
-
+|       Metric        | Notes               | Labels                                             |
+| :-----------------: | :------------------ | :------------------------------------------------- |
+| `event_normal_k8s`  | Normal k8s events.  | `kind`, `namespace`, `reason`, `source_components` |
+| `event_warning_k8s` | Warning k8s events. | `kind`, `namespace`, `reason`, `source_components` |
 
 ### Event reasons
 
-| Kind                                            | Reason
-|-------------------------------------------------|------------------------------------
-| Pod (Normal)            | Scheduled, Pulling, Pulled, Created, Started
-| Pod (Warning)           | BackOff, Unhealthy, FailedMount
-| ReplicationController   | SuccessfulCreate
-| DeploymentConfig        | DeploymentCreated
-| DaemonSet               | FailedCreate
-| StatefulSet             | FailedCreate
-| HorizontalPodAutoscaler | FailedGetResourceMetric
-| Node                    | Rebooted, NodeNotReady, HostPortConflict
+| Kind                    | Reason                                       |
+| ----------------------- | -------------------------------------------- |
+| Pod (Normal)            | Scheduled, Pulling, Pulled, Created, Started |
+| Pod (Warning)           | BackOff, Unhealthy, FailedMount              |
+| ReplicationController   | SuccessfulCreate                             |
+| DeploymentConfig        | DeploymentCreated                            |
+| DaemonSet               | FailedCreate                                 |
+| StatefulSet             | FailedCreate                                 |
+| HorizontalPodAutoscaler | FailedGetResourceMetric                      |
+| Node                    | Rebooted, NodeNotReady, HostPortConflict     |
 
 ## Security
 
 ### Reporting security vulnerabilities
 
-If you find a security vulnerability or any security related issues, please DO NOT file a public issue, instead send your report privately to cloud@snapp.cab. Security reports are greatly appreciated and we will publicly thank you for it.
+If you find a security vulnerability or any security related issues, please DO NOT file a public issue,
+instead send your report privately to cloud@snapp.cab.
+Security reports are greatly appreciated, and we will publicly thank you for it.
 
 ## License
 
