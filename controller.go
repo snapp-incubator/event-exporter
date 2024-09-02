@@ -6,6 +6,7 @@ import (
 	"k8s.io/client-go/informers"
 	coreinformers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/tools/cache"
+	klog "k8s.io/klog/v2"
 
 	v1 "k8s.io/api/core/v1"
 )
@@ -47,12 +48,15 @@ func NewEventExporterController(informerFactory informers.SharedInformerFactory)
 		informerFactory: informerFactory,
 		eventInformer:   eventInformer,
 	}
-	eventInformer.Informer().AddEventHandler(
+	if _, err := eventInformer.Informer().AddEventHandler(
 		// Your custom resource event handlers.
 		cache.ResourceEventHandlerFuncs{
 			// Called on creation
 			AddFunc: c.eventAdd,
 		},
-	)
+	); err != nil {
+		klog.ErrorS(err, "failed to add informer event handler")
+	}
+
 	return c
 }
